@@ -40,62 +40,65 @@ const EditProfile = () => {
     setProfileImage(e.target.files[0]);
   };
 
-  const saveProfile = async (e) => {
-  e.preventDefault();
-  console.log("eee",e);
+  // const saveProfile = async (e) => {
+  // e.preventDefault();
+  // console.log("eee",e);
 
-   setIsLoading(true);
-    try {
-      // Handle Image upload
-      let imageURL;
-      if (
-        profileImage &&
-        (profileImage.type === "image/jpeg" ||
-          profileImage.type === "image/jpg" ||
-          profileImage.type === "image/png")
-      ) {
-        const image = new FormData();
-        image.append("file", profileImage);
-        image.append("cloud_name", "saveencloud");
-        image.append("upload_preset", "zj3nwzh9");
+  //  setIsLoading(true);
+  //   try {
+  //     // Handle Image upload
+  //     let imageURL;
+  //     if (
+  //       profileImage &&
+  //       (profileImage.type === "image/jpeg" ||
+  //         profileImage.type === "image/jpg" ||
+  //         profileImage.type === "image/png")
+  //     ) {
+  //       const image = new FormData();
+  //       image.append("file", profileImage);
+  //       image.append("cloud_name", "saveencloud");
+  //       image.append("upload_preset", "zj3nwzh9");
                   
-        const response = await fetch(
-          "https://api.cloudinary.com/v1_1/saveencloud/image/upload",
-          { method: "post", body: image }
-        );
-        // const image = new FormData();
-        // image.append("file", profileImage);
-        // image.append("cloud_name", "saveencloud");
-        // image.append("upload_preset", "wk66xdkq");
+  //       const response = await fetch(
+  //         "https://api.cloudinary.com/v1_1/saveencloud/image/upload",
+  //         { method: "post", body: image }
+  //       );
+  //       if (!response.ok) {
+  //         throw new Error("Failed to upload image");
+  //       }
+  //       // const image = new FormData();
+  //       // image.append("file", profileImage);
+  //       // image.append("cloud_name", "saveencloud");
+  //       // image.append("upload_preset", "wk66xdkq");
 
-        // // First save image to cloudinary
-        // const response = await fetch(
-        //   "https://console.cloudinary.com/pm/c-b9bf2d5c08c1a623ece4d2151ae54a/media-explorer/upload",
-        //   { method: "post", body: image }
-        // );
-        const imgData = await response.json();
-        imageURL = imgData.url.toString();
+  //       // // First save image to cloudinary
+  //       // const response = await fetch(
+  //       //   "https://console.cloudinary.com/pm/c-b9bf2d5c08c1a623ece4d2151ae54a/media-explorer/upload",
+  //       //   { method: "post", body: image }
+  //       // );
+  //       const imgData = await response.json();
+  //       imageURL = imgData.url.toString();
 
-        // Save Profile
-        const formData = {
-          name: profile.name,
-          phone: profile.phone,
-          bio: profile.bio,
-          photo: profileImage ? imageURL : profile.photo,
-        };
+  //       // Save Profile
+  //       const formData = {
+  //         name: profile.name,
+  //         phone: profile.phone,
+  //         bio: profile.bio,
+  //         photo: profileImage ? imageURL : profile.photo,
+  //       };
 
-        const data = await updateUser(formData);
-        console.log("data",data);
-        toast.success("User updated");
-        navigate("/profile");
-        setIsLoading(false);
-      }
-    } catch (error) {
-      console.log(error);
-      setIsLoading(false);
-      toast.error(error.message);
-    }
-  };
+  //       const data = await updateUser(formData);
+  //       console.log("data",data);
+  //       toast.success("User updated");
+  //       navigate("/profile");
+  //       setIsLoading(false);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //     setIsLoading(false);
+  //     toast.error(error.message);
+  //   }
+  // };
 
   // const saveProfile = async (e) => {
   //   e.preventDefault();
@@ -150,6 +153,65 @@ const EditProfile = () => {
   //     setIsLoading(false);
   //   }
   // };
+  
+
+  const saveProfile = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      let imageURL;
+      if (
+        profileImage &&
+        (profileImage.type === "image/jpeg" ||
+          profileImage.type === "image/jpg" ||
+          profileImage.type === "image/png")
+      ) {
+        const image = new FormData();
+        image.append("file", profileImage);
+        image.append("cloud_name", "saveencloud");
+        image.append("upload_preset", "zj3nwzh9");
+                    
+        const response = await fetch(
+          "https://api.cloudinary.com/v1_1/saveencloud/image/upload",
+          { method: "post", body: image }
+        );
+        if (!response.ok) {
+          throw new Error("Failed to upload image");
+        }
+        const imgData = await response.json();
+        imageURL = imgData.url.toString();
+  
+        // Save Profile
+        const formData = {
+          name: profile.name,
+          phone: profile.phone,
+          bio: profile.bio,
+          photo: profileImage ? imageURL : profile.photo,
+        };
+  
+        const data = await updateUser(formData);
+        if (!data) {
+          throw new Error("Failed to update user");
+        }
+  
+        // Update the profile state with the new data
+        setProfile({
+          ...profile,
+          name: formData.name,
+          phone: formData.phone,
+          bio: formData.bio,
+          photo: formData.photo
+        });
+  
+        toast.success("User updated");
+        navigate("/profile");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setIsLoading(false);
+      toast.error(error.message);
+    }
+  };
   
   return (
     <div className="profile --my2">
