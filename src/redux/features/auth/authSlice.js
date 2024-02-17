@@ -5,7 +5,7 @@ import { createSlice } from "@reduxjs/toolkit";
 // console.log("Stored name from localStorage:", storedName)
 // const name = storedName ? JSON.parse(storedName) : "";
 const storedName = localStorage.getItem("name");
-console.log("Stored name from localStorage:", storedName);
+// console.log("Stored name from localStorage:", storedName);
 
 let name = "";
 if (storedName !== null) {
